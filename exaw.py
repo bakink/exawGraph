@@ -2,22 +2,27 @@ import os
 import re
 
 
+def get_stat_date(file_rows_list):
+    string_num = 7
+    p = re.compile('<.*>')
+    m = p.search(file_rows_list[string_num])
+    return m.group().split()[0][1:]
+
+
 def parse_mpstat(mpstatout_dir):
     print('Parsing mpstat files...')
     data_struct = []
     for filename in os.listdir(mpstatout_dir):
         if filename.endswith('.dat'):
+            print()
             print(filename)
             with open(mpstatout_dir + '\\' + filename) as f:
                 rows = f.readlines()
-            p = re.compile('<.*>')
-            m = p.search(rows[7])
-            stat_date = m.group().split()[0][1:]
+            stat_date = get_stat_date(rows)
             for line in rows:
                 all_cpu_rows = re.findall(r'all', line)
                 if all_cpu_rows:
                     l = line.split()
-                    print(l)
                     data_struct.append([stat_date + ' ' + l[0] + ' ' + l[1], {'%user': l[3], '%sys': l[5], '%iowait': l[6]}])
             print(data_struct)
 
