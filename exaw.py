@@ -12,7 +12,8 @@ def get_stat_date(file_rows_list):
 def parse_mpstat(mpstatout_dir):
     print('Parsing mpstat files...')
     data_struct = []
-    for filename in os.listdir(mpstatout_dir):
+    ctime = lambda fn: os.stat(os.path.join(mpstatout_dir, fn)).st_mtime
+    for filename in list(sorted(os.listdir(mpstatout_dir), key=ctime)):
         if filename.endswith('.dat'):
             print()
             print(filename)
@@ -23,7 +24,8 @@ def parse_mpstat(mpstatout_dir):
                 all_cpu_rows = re.findall(r'all', line)
                 if all_cpu_rows:
                     l = line.split()
-                    data_struct.append([stat_date + ' ' + l[0] + ' ' + l[1], {'%user': l[3], '%sys': l[5], '%iowait': l[6]}])
+                    data_struct.append(
+                        [stat_date + ' ' + l[0] + ' ' + l[1], {'%user': l[3], '%sys': l[5], '%iowait': l[6]}])
             print(data_struct)
 
 
@@ -41,4 +43,4 @@ def main():
 
 
 if __name__ == '__main__':
-        main()
+    main()
